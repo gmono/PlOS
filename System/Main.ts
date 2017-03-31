@@ -15,11 +15,11 @@ namespace System
         {
             let guid=UIManager.CreateWindow();
             UIManager.SetRect(guid,<UIManager.IRect>{x:400,y:100,h:300,w:400});
-            UIManager.SetProj(guid,"fillStyle","#000000");
+            UIManager.SetPaintProj(guid,"fillStyle","#000000");
             UIManager.Paint(guid,"fillRect",JSON.stringify([0,0,300,400]));
             let w2=UIManager.CreateWindow();
             UIManager.SetRect(w2,<UIManager.IRect>{x:500,y:0,h:200,w:300});
-            UIManager.SetProj(w2,"fillStyle","#ffc0cb");
+            UIManager.SetPaintProj(w2,"fillStyle","#ffc0cb");
             UIManager.Paint(w2,"fillRect",JSON.stringify([0,0,200,300]));
             UIManager.Show(w2);
             UIManager.Show(guid);

@@ -109,31 +109,27 @@ namespace System
             win.AddListener("click",()=>{Active(guidstr);});
             return guidstr;
         }
+
+
         export function SetRect(guid:string,rect:IRect)
         {
             SetPosition(guid,<IPoint>{x:rect.x,y:rect.y});
             SetSize(guid,<ISize>{w:rect.w,h:rect.h});
         }
-        export function SetPosition(guid:string,pos:IPoint)
+        //以下为包装函数 使用装饰器包装
+        //此函数将window类的对应函数对外公开为全局函数
+        function  ToGlobalFun(fun:Function)
         {
-            let win:WindowInfo=WinSet[guid];
-            win.SetPosition(pos);
+            return (guid:string,...args)=>{
+
+                let win:WindowInfo=WinSet[guid];
+                fun.apply(win,args);
+            };
         }
-        export function SetSize(guid:string,size:ISize)
-        {
-            let win:WindowInfo=WinSet[guid];
-            win.SetSize(size);
-        }
-        export function Show(guid:string)
-        {
-            let win:WindowInfo=WinSet[guid];
-            win.Show();
-        }
-        export function Hide(guid:string)
-        {
-            let win:WindowInfo=WinSet[guid];
-            win.Hide();
-        }
+        export let SetPosition=ToGlobalFun(WindowInfo.prototype.SetPosition);
+        export let SetSize=ToGlobalFun(WindowInfo.prototype.SetSize);
+        export let Show=ToGlobalFun(WindowInfo.prototype.Show);
+        export let Hide=ToGlobalFun(WindowInfo.prototype.Hide);
         //最小化
         export function Min(guid:string)
         {
@@ -175,22 +171,10 @@ namespace System
         }
 
         //绘图
-        export function Paint(guid:string,fun:string,pars:string)
-        {
-            let win:WindowInfo=WinSet[guid];
-            win.Paint(fun,pars);
-        }
-        export function SetProj(guid:string,proj:string,val:string)
-        {
-            let win:WindowInfo=WinSet[guid];
-            win.SetContextPars(proj,val);
-        }
+        export let Paint=ToGlobalFun(WindowInfo.prototype.Paint);
+        export let SetPaintProj=ToGlobalFun(WindowInfo.prototype.SetContextPars);
         //事件
-        export function AddListener(guid:string,name:string,fun:EventListener)
-        {
-            let win:WindowInfo=WinSet[guid];
-            win.AddListener(name,fun);
-        }
+        export let AddListener=ToGlobalFun(WindowInfo.prototype.AddListener);
 
         //下面为类型定义
         export interface IRect

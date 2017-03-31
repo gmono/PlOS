@@ -95,30 +95,26 @@ var System;
         }
         UIManager.CreateWindow = CreateWindow;
         function SetRect(guid, rect) {
-            SetPosition(guid, { x: rect.x, y: rect.y });
-            SetSize(guid, { w: rect.w, h: rect.h });
+            UIManager.SetPosition(guid, { x: rect.x, y: rect.y });
+            UIManager.SetSize(guid, { w: rect.w, h: rect.h });
         }
         UIManager.SetRect = SetRect;
-        function SetPosition(guid, pos) {
-            var win = WinSet[guid];
-            win.SetPosition(pos);
+        //以下为包装函数 使用装饰器包装
+        //此函数将window类的对应函数对外公开为全局函数
+        function ToGlobalFun(fun) {
+            return function (guid) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                var win = WinSet[guid];
+                fun.apply(win, args);
+            };
         }
-        UIManager.SetPosition = SetPosition;
-        function SetSize(guid, size) {
-            var win = WinSet[guid];
-            win.SetSize(size);
-        }
-        UIManager.SetSize = SetSize;
-        function Show(guid) {
-            var win = WinSet[guid];
-            win.Show();
-        }
-        UIManager.Show = Show;
-        function Hide(guid) {
-            var win = WinSet[guid];
-            win.Hide();
-        }
-        UIManager.Hide = Hide;
+        UIManager.SetPosition = ToGlobalFun(WindowInfo.prototype.SetPosition);
+        UIManager.SetSize = ToGlobalFun(WindowInfo.prototype.SetSize);
+        UIManager.Show = ToGlobalFun(WindowInfo.prototype.Show);
+        UIManager.Hide = ToGlobalFun(WindowInfo.prototype.Hide);
         //最小化
         function Min(guid) {
         }
@@ -154,22 +150,10 @@ var System;
         }
         UIManager.Active = Active;
         //绘图
-        function Paint(guid, fun, pars) {
-            var win = WinSet[guid];
-            win.Paint(fun, pars);
-        }
-        UIManager.Paint = Paint;
-        function SetProj(guid, proj, val) {
-            var win = WinSet[guid];
-            win.SetContextPars(proj, val);
-        }
-        UIManager.SetProj = SetProj;
+        UIManager.Paint = ToGlobalFun(WindowInfo.prototype.Paint);
+        UIManager.SetPaintProj = ToGlobalFun(WindowInfo.prototype.SetContextPars);
         //事件
-        function AddListener(guid, name, fun) {
-            var win = WinSet[guid];
-            win.AddListener(name, fun);
-        }
-        UIManager.AddListener = AddListener;
+        UIManager.AddListener = ToGlobalFun(WindowInfo.prototype.AddListener);
     })(UIManager = System.UIManager || (System.UIManager = {}));
 })(System || (System = {}));
 //# sourceMappingURL=UIManager.js.map
