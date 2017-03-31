@@ -72,6 +72,12 @@ var System;
                     throw "绘图属性设置错误！";
                 }
             };
+            WindowInfo.prototype.AddListener = function (name, fun) {
+                this.canvas.addEventListener(name, fun);
+            };
+            WindowInfo.prototype.Focus = function () {
+                this.canvas.focus();
+            };
             return WindowInfo;
         }());
         var WinSet = {}; //string -> WindowInfo
@@ -83,6 +89,8 @@ var System;
             WinSet[guidstr] = win;
             //加入窗口栈
             WindowStack.push(win);
+            //添加点击激活
+            win.AddListener("click", function () { Active(guidstr); });
             return guidstr;
         }
         UIManager.CreateWindow = CreateWindow;
@@ -142,6 +150,7 @@ var System;
             }
             WindowStack[WindowStack.length - 1] = win;
             win.SetIndex(WindowStack.length - 1);
+            win.Focus(); //窗口放在顶层并获得焦点
         }
         UIManager.Active = Active;
         //绘图
@@ -155,6 +164,12 @@ var System;
             win.SetContextPars(proj, val);
         }
         UIManager.SetProj = SetProj;
+        //事件
+        function AddListener(guid, name, fun) {
+            var win = WinSet[guid];
+            win.AddListener(name, fun);
+        }
+        UIManager.AddListener = AddListener;
     })(UIManager = System.UIManager || (System.UIManager = {}));
 })(System || (System = {}));
 //# sourceMappingURL=UIManager.js.map

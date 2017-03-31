@@ -86,6 +86,14 @@ namespace System
                     throw "绘图属性设置错误！";
                 }
             }
+            public AddListener(name:string,fun:EventListener)
+            {
+                this.canvas.addEventListener(name,fun);
+            }
+            public Focus()
+            {
+                this.canvas.focus();
+            }
         }
         let WinSet={};//string -> WindowInfo
         let WindowStack:Array<WindowInfo>=[];
@@ -97,6 +105,8 @@ namespace System
             WinSet[guidstr]=win;
             //加入窗口栈
             WindowStack.push(win);
+            //添加点击激活
+            win.AddListener("click",()=>{Active(guidstr);});
             return guidstr;
         }
         export function SetRect(guid:string,rect:IRect)
@@ -161,6 +171,7 @@ namespace System
             }
             WindowStack[WindowStack.length-1]=win;
             win.SetIndex(WindowStack.length-1);
+            win.Focus(); //窗口放在顶层并获得焦点
         }
 
         //绘图
@@ -173,6 +184,12 @@ namespace System
         {
             let win:WindowInfo=WinSet[guid];
             win.SetContextPars(proj,val);
+        }
+        //事件
+        export function AddListener(guid:string,name:string,fun:EventListener)
+        {
+            let win:WindowInfo=WinSet[guid];
+            win.AddListener(name,fun);
         }
 
         //下面为类型定义
