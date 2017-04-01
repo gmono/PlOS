@@ -2,7 +2,15 @@
   "compilerOptions": {
     "module": "none",
     "target": "es5",
-    "sourceMap": true
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "lib": [
+      "es5",
+      "dom",
+      "webworker",
+      "es2015",
+      "es2017"
+    ]
   },
   "exclude": [
     "node_modules"

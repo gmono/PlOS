@@ -24,7 +24,6 @@ namespace System
             UIManager.Show(w2);
             UIManager.Show(guid);
         }
-
     }
 }
 window.onload=System.Main.Main;
