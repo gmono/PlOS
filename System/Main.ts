@@ -9,7 +9,6 @@ namespace System
         //系统初始化函数 此函数执行后系统才能正常工作
         function Init()
         {
-
         }
         export function Main()
         {
