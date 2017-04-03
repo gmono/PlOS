@@ -13,39 +13,78 @@ var System;
             });
         }
         Tools.Guid = Guid;
-        //容器类
-        //这里自己模拟一个Map和Set类 以免受到智能提示支持不足的影响
-        //同时实现一个栈
-        var Stack = (function () {
-            function Stack() {
-                this.contain = [];
+        //简单的将一个对象方法转换为一个静态方法
+        function ToStaticFunction(func, obj) {
+            return function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                func.apply(obj, args);
+            };
+        }
+        Tools.ToStaticFunction = ToStaticFunction;
+        //将一个对象的某个方法“对接”到另一个对象的另一方法上
+        //注意这和方法赋值是不同的 后者会改变this默认值
+        function AdaptFunction(rfname, rawobj, afname, adaptobj) {
+            adaptobj[afname] = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                //这里处理如果外部调用call或者apply时的情况
+                if (this != adaptobj) {
+                    rawobj[rfname].apply(this, args);
+                }
+                else
+                    rawobj[rfname].apply(rawobj, args);
+            };
+        }
+        Tools.AdaptFunction = AdaptFunction;
+        function AdaptProp(rfname, rawobj, afname, adaptobj) {
+            Object.defineProperty(adaptobj, afname, { get: function () { return rawobj[rfname]; },
+                set: function (v) { rawobj[rfname] = v; } });
+        }
+        Tools.AdaptProp = AdaptProp;
+        //对接两个对象的同名方法
+        function AdaptOneFunc(name, robj, aobj) {
+            AdaptFunction(name, robj, name, aobj);
+        }
+        Tools.AdaptOneFunc = AdaptOneFunc;
+        function AdaptOneProp(name, robj, aobj) {
+            AdaptProp(name, robj, name, aobj);
+        }
+        Tools.AdaptOneProp = AdaptOneProp;
+        //嫁接所有方法和属性
+        function AdaptAll(robj, aobj, except) {
+            for (var t in robj) {
+                //跳过排除的
+                if (except.has(t))
+                    continue;
+                if (typeof robj[t] == "function") {
+                    AdaptOneFunc(t, robj, aobj);
+                }
+                else {
+                    AdaptOneProp(t, robj, aobj);
+                }
             }
-            ///此函数返回当前栈的item数
-            Stack.prototype.push = function (obj) {
-                this.contain.push(obj);
-                return this.contain.length;
-            };
-            //此函数弹出当前栈的栈顶 如果栈空则返回undefined
-            Stack.prototype.pop = function () {
-                if (this.contain.length == 0) {
-                    return undefined;
+        }
+        Tools.AdaptAll = AdaptAll;
+        //桥接多个
+        function AdaptMore(robj, aobj, adapts) {
+            for (var t in robj) {
+                //跳过不桥接的
+                if (!adapts.has(t))
+                    continue;
+                if (typeof robj[t] == "function") {
+                    AdaptOneFunc(t, robj, aobj);
                 }
-                var temp = this.front();
-                this.contain.length--;
-                return temp;
-            };
-            //返回栈顶引用空返回undefined
-            Stack.prototype.front = function () {
-                if (this.contain.length == 0) {
-                    return undefined;
+                else {
+                    AdaptOneProp(t, robj, aobj);
                 }
-            };
-            Stack.prototype.length = function () {
-                return this.contain.length;
-            };
-            return Stack;
-        }());
-        Tools.Stack = Stack;
+            }
+        }
+        Tools.AdaptMore = AdaptMore;
     })(Tools = System.Tools || (System.Tools = {}));
 })(System || (System = {}));
 //# sourceMappingURL=Tools.js.map

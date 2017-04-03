@@ -11,7 +11,7 @@ namespace Protocol
             
             private TransFunc:TransFunction=null;
             private RectiverSet:Array<ReceiveFunction>=[];
-            public TransPortBase(tfunc:TransFunction)
+            public constructor(tfunc:TransFunction)
             {
                 //注册传输函数
                 this.TransFunc=tfunc;

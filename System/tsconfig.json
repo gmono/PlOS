@@ -9,7 +9,9 @@
       "dom",
       "webworker",
       "es2015",
-      "es2017"
+      "es2017",
+      "es2015.generator",
+      "es2015.iterable"
     ]
   },
   "exclude": [

@@ -4,14 +4,12 @@ var Protocol;
     var TransPort;
     (function (TransPort) {
         var TransPortBase = (function () {
-            function TransPortBase() {
+            function TransPortBase(tfunc) {
                 this.TransFunc = null;
                 this.RectiverSet = [];
-            }
-            TransPortBase.prototype.TransPortBase = function (tfunc) {
                 //注册传输函数
                 this.TransFunc = tfunc;
-            };
+            }
             TransPortBase.prototype.registReceiver = function (func) {
                 this.RectiverSet.push(func);
             };
