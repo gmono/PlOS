@@ -64,6 +64,7 @@ namespace System
         {
             let guid=Tools.Guid();
             let proc=new Process(guid,path,()=>{});
+            
         }
         export function CreateProcess(code:string)
         {
