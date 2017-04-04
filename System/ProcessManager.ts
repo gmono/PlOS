@@ -54,21 +54,27 @@ namespace System
         
 
         //以下为管理器部分
-
+        //guid->process
         let ProcessMap:Map<string,Process>=new Map<string,Process>();
-        function GlobalReceive(guid:string)
+        function GlobalReceive(guid:string,data:any)
         {
 
         }
-        export function CreateProcessFromUrl(path:string)
+        export function CreateProcessFromUrl(path:string):string
         {
             let guid=Tools.Guid();
-            let proc=new Process(guid,path,()=>{});
-            
+            let proc=new Process(guid,path,(data:any)=>{
+                GlobalReceive(guid,data);
+            });
+            ProcessMap.set(guid,proc);
+            proc.Init();
+            return guid;
         }
-        export function CreateProcess(code:string)
+        export function CreateProcess(code:string):string
         {
-            
+            let blob=new Blob([code],{type:"text/plain"});
+            let url=window.URL.createObjectURL(blob);
+            return CreateProcessFromUrl(url);
         }
 
     }

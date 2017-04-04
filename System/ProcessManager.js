@@ -47,15 +47,24 @@ var System;
         }());
         ProcessManager.Process = Process;
         //以下为管理器部分
+        //guid->process
         var ProcessMap = new Map();
-        function GlobalReceive(guid) {
+        function GlobalReceive(guid, data) {
         }
         function CreateProcessFromUrl(path) {
             var guid = System.Tools.Guid();
-            var proc = new Process(guid, path, function () { });
+            var proc = new Process(guid, path, function (data) {
+                GlobalReceive(guid, data);
+            });
+            ProcessMap.set(guid, proc);
+            proc.Init();
+            return guid;
         }
         ProcessManager.CreateProcessFromUrl = CreateProcessFromUrl;
         function CreateProcess(code) {
+            var blob = new Blob([code], { type: "text/plain" });
+            var url = window.URL.createObjectURL(blob);
+            return CreateProcessFromUrl(url);
         }
         ProcessManager.CreateProcess = CreateProcess;
     })(ProcessManager = System.ProcessManager || (System.ProcessManager = {}));
