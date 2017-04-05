@@ -23,7 +23,17 @@ var Protocol;
             JSONTransPort.prototype.sendBlob = function (blob) {
             };
             //下面这个函数由外部调用传入一个接收到的数据
-            JSONTransPort.prototype.receiveData = function (obj) {
+            JSONTransPort.prototype.receiveData = function (data) {
+                if (typeof data == "string") {
+                    try {
+                        var obj = JSON.parse(data);
+                        this.CallAllReceiver(obj);
+                    }
+                    catch (e) {
+                        throw "错误！接收数据解析失败！";
+                    }
+                }
+                throw "错误！JSONTransPort接收数据类型错误！";
             };
             return JSONTransPort;
         }(TransPort.TransPortBase));
