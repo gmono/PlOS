@@ -39,7 +39,7 @@ namespace Protocol
                 }
             }
             //下面这个函数由外部调用传入一个接收到的数据
-            public receiveData(data:any):void
+            protected receiveData(data:any):void
             {
                 if(typeof data =="string")
                 {
