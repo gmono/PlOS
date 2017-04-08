@@ -13,14 +13,35 @@ var Protocol;
 (function (Protocol) {
     var TransPort;
     (function (TransPort) {
+        function arrayBufferToJson(buffer) {
+            var gbuff = buffer;
+            var v = new Uint8Array(gbuff);
+            var ret = JSON.stringify(v);
+            return ret;
+        }
         var JSONTransPort = (function (_super) {
             __extends(JSONTransPort, _super);
             function JSONTransPort() {
                 return _super !== null && _super.apply(this, arguments) || this;
             }
             JSONTransPort.prototype.sendObject = function (obj) {
+                var json = JSON.stringify(obj);
+                this.TransFunc(json);
             };
             JSONTransPort.prototype.sendBlob = function (blob) {
+                if (blob == null) {
+                    this.TransFunc("null");
+                    return;
+                }
+                if (blob instanceof ArrayBuffer || blob instanceof SharedArrayBuffer) {
+                    var str = arrayBufferToJson(blob);
+                    this.TransFunc(str);
+                }
+                else {
+                    var reader = new FileReader();
+                    reader.readAsArrayBuffer(blob);
+                    this.sendBlob(reader.result); //调用自身发送arraybuffer
+                }
             };
             //下面这个函数由外部调用传入一个接收到的数据
             JSONTransPort.prototype.receiveData = function (data) {
