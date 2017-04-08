@@ -11,6 +11,7 @@ namespace Protocol
             Both,
             None
         };
+        export type IPOPCallBack=(data:TransPort.GenericData)=>TransPort.GenericData;
         /**
          * 此为IPOP协议中的标准被调用接口的基本类
          * 提供附加属性
@@ -23,8 +24,8 @@ namespace Protocol
         {
             public Pars:ParsType=ParsType.None;
             public HasResult:boolean=false;
-            public Func:Function=null;
-            public constructor(fun:Function,partype:ParsType=ParsType.None,result:boolean=false)
+            public Func:IPOPCallBack=null;
+            public constructor(fun:IPOPCallBack,partype:ParsType=ParsType.None,result:boolean=false)
             {
                 this.Func=fun;
                 this.Pars=partype;
