@@ -36,6 +36,7 @@ namespace Protocol
              * InnerSend
              * 内部数据传递函数
              * 此函数与sendData函数类似 但不做任何数据上的转换，直接转发内部数据
+             * 内部通道入口
              */
             public InnerSend(data:any) {
                 this.TransFunc(data);
@@ -43,49 +44,28 @@ namespace Protocol
             /**
              * sendData 通用数据发送函数
              * 调用内部的两个抽象函数发送数据
+             * 正向通道入口
              */
             public sendData(data:GenericData) {
+                let t;
                 if(data instanceof ArrayBuffer||data instanceof SharedArrayBuffer||data instanceof Blob)
                 {
-                    this.sendBlob(data);
+                    t=this.TransBlob(data);
                 }
                 else
                 {
-                    this.sendObject(data);
+                    t=this.TransObject(data);
                 }
+                this.TransFunc(t);
             }
-            public abstract sendObject(obj:object):void;
-            public abstract sendBlob(blob:BinObject):void;
+            //转换函数
+            public abstract TransObject(obj:object):any;
+            public abstract TransBlob(blob:BinObject):any;
             /**
-             * 下面这个函数由外部调用传入一个接收到的数据
-             *  这个数据data其实是TransPort的内部数据格式 具体视情况而定
-             *  例如JSONTransPort的内部数据就是string
-             */
-            protected abstract receiveData(data:any):void;
-            /**
-             * Receive为对外接收数据的函数
+             * Receive为反向通道入口
              */
             public Receive(data:any):void {
-                //调用所有RawReceiver
-                for(let fun of this.RawRectivers)
-                {
-                    fun(data);
-                }
-                this.receiveData(data);
-            }
-            public registReceiver(func:ReceiveFunction):void
-            {
-                this.RectiverSet.push(func);
-            }
-            public registRawRectiver(func:TransFunction):void{
-                this.RawRectivers.push(func);
-            }
-            protected CallAllReceiver(data:GenericData):void
-            {
-                for(let t of this.RectiverSet)
-                {
-                    t(data);
-                }
+                
             }
 
         }

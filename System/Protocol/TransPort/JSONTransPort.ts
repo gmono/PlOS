@@ -13,48 +13,29 @@ namespace Protocol
         }
         export class JSONTransPort extends TransPortBase
         {
-            public sendObject(obj:object):void
+            public TransObject(obj:object):any
             {
                 let json=JSON.stringify(obj);
-                this.TransFunc(json);
+                return json;
             }
-            public sendBlob(blob:BinObject):void
+            public TransBlob(blob:BinObject):any
             {
                 if(blob==null)
                 {
-                    this.TransFunc("null");
-                    return;
+                    return null;
                 }
                 if(blob instanceof ArrayBuffer||blob instanceof SharedArrayBuffer)
                 {
                     let str=arrayBufferToJson(blob);
-                    this.TransFunc(str);
+                    return str;
                 }
                 else 
                 {
                     
                     let reader=new FileReader();
                     reader.readAsArrayBuffer(blob);
-                    this.sendBlob(reader.result); //调用自身发送arraybuffer
+                    return this.TransBlob(reader.result); //调用自身发送arraybuffer
                 }
             }
-            //下面这个函数由外部调用传入一个接收到的数据
-            protected receiveData(data:any):void
-            {
-                if(typeof data =="string")
-                {
-                    try
-                    {
-                        let obj=JSON.parse(data);
-                        this.CallAllReceiver(obj);
-                    }
-                    catch(e)
-                    {
-                        throw "错误！接收数据解析失败！";
-                    }
-                }
-                throw "错误！JSONTransPort接收数据类型错误！";
-            }
-        }
     }
 }
