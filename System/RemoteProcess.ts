@@ -58,7 +58,7 @@ namespace System
             //是function
             let ret=(<Function>now).apply(old,info.params);
             //回送返回值
-            msgfunc(info.sign,ret);
+            msgfunc(<RemoteReturn>{sign:info.sign,data:ret});
         }
 
     }

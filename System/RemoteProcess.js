@@ -81,7 +81,7 @@ var System;
                     }
                     ret = now.apply(old, info.params);
                     //回送返回值
-                    msgfunc(info.sign, ret);
+                    msgfunc({ sign: info.sign, data: ret });
                     return [2 /*return*/];
                 });
             });
