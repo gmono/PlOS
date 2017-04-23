@@ -5,13 +5,10 @@
     "sourceMap": true,
     "experimentalDecorators": true,
     "lib": [
-      "es5",
       "dom",
       "webworker",
       "es2015",
-      "es2017",
-      "es2015.generator",
-      "es2015.iterable"
+      "es2017"
     ]
   },
   "exclude": [
