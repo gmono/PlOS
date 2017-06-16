@@ -13,6 +13,7 @@ namespace System
     {
         const ArrayName='Listeners';
         let TypeSet={};
+        //查询是否有指定类型的消息
         export  function HasMessageType(tyns:Array<string>):boolean
         {
             let nowobj=TypeSet;
@@ -27,6 +28,7 @@ namespace System
             }
             return true;
         }
+        //获取指定类型消息对应的监听器列表
         export function GetMessageListenObject(tyns:Array<string>):Array<(obj:any)=>void>
         {
             let nowobj=TypeSet;
@@ -41,6 +43,7 @@ namespace System
             }
             return nowobj[ArrayName];
         }
+        //注册一个消息类型
         export function RegistMessageType(tyns:Array<string>):boolean
         {
             if(HasMessageType(tyns)) return false;
@@ -62,6 +65,7 @@ namespace System
         }
         //obj为消息参数
         //在广播消息时由广播者提供
+        //注册一个消息监听器
         export function RegistEventListener(tyns:Array<string>,listen:(obj:any)=>void):boolean
         {
             if(HasMessageType(tyns))
@@ -72,6 +76,7 @@ namespace System
             }
             else return false;
         }
+        //发送一个消息
         export function SendMessage(tyns:Array<string>,obj:any)
         {
             let larr=GetMessageListenObject(tyns);
@@ -84,6 +89,8 @@ namespace System
         }
 
         //辅助函数 装饰器实现
+        //此函数用于将System.Event.XXX这样的字符串类型名转换为数组
+        //返回一个新函数 用于提供字符串参数接收功能
         function ToStrFun(fun:Function)
         {
             return (fullname:string,...args):any=>{
@@ -91,10 +98,10 @@ namespace System
                 fun(arr,...args);
             };
         }
-        let SendMsg=ToStrFun(SendMessage);
-        let HasMsgType=ToStrFun(HasMessageType);
-        let GetListenerArray=ToStrFun(GetMessageListenObject);
-        let Regist=ToStrFun(RegistMessageType);
-        let ListenRegist=ToStrFun(RegistEventListener);
+        export let SendMsg=ToStrFun(SendMessage);
+        export let HasMsgType=ToStrFun(HasMessageType);
+        export let GetListenerArray=ToStrFun(GetMessageListenObject);
+        export let Regist=ToStrFun(RegistMessageType);
+        export let ListenRegist=ToStrFun(RegistEventListener);
     }
 }

@@ -87,6 +87,8 @@ namespace System
             }
             throw new Error("错误！全局调用接收器无法找到对应Process");
         }
+        //从一个URL创建一个进程
+        //此URL应是一个合法的js文件
         export function CreateProcessFromUrl(path:string):string
         {
             let guid=Tools.Guid();
@@ -97,6 +99,8 @@ namespace System
             proc.Init();
             return guid;
         }
+        //此函数通过string创建进程
+        //通过bolb创建对象url来创建Worker
         export function CreateProcess(code:string):string
         {
             let blob=new Blob([code],{type:"text/plain"});

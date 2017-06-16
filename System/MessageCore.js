@@ -12,6 +12,7 @@ var System;
     (function (MessageCore) {
         var ArrayName = 'Listeners';
         var TypeSet = {};
+        //查询是否有指定类型的消息
         function HasMessageType(tyns) {
             var nowobj = TypeSet;
             for (var _i = 0, tyns_1 = tyns; _i < tyns_1.length; _i++) {
@@ -25,6 +26,7 @@ var System;
             return true;
         }
         MessageCore.HasMessageType = HasMessageType;
+        //获取指定类型消息对应的监听器列表
         function GetMessageListenObject(tyns) {
             var nowobj = TypeSet;
             for (var _i = 0, tyns_2 = tyns; _i < tyns_2.length; _i++) {
@@ -38,6 +40,7 @@ var System;
             return nowobj[ArrayName];
         }
         MessageCore.GetMessageListenObject = GetMessageListenObject;
+        //注册一个消息类型
         function RegistMessageType(tyns) {
             if (HasMessageType(tyns))
                 return false;
@@ -59,6 +62,7 @@ var System;
         MessageCore.RegistMessageType = RegistMessageType;
         //obj为消息参数
         //在广播消息时由广播者提供
+        //注册一个消息监听器
         function RegistEventListener(tyns, listen) {
             if (HasMessageType(tyns)) {
                 var obj = GetMessageListenObject(tyns);
@@ -69,6 +73,7 @@ var System;
                 return false;
         }
         MessageCore.RegistEventListener = RegistEventListener;
+        //发送一个消息
         function SendMessage(tyns, obj) {
             var larr = GetMessageListenObject(tyns);
             for (var _i = 0, larr_1 = larr; _i < larr_1.length; _i++) {
@@ -80,6 +85,8 @@ var System;
         }
         MessageCore.SendMessage = SendMessage;
         //辅助函数 装饰器实现
+        //此函数用于将System.Event.XXX这样的字符串类型名转换为数组
+        //返回一个新函数 用于提供字符串参数接收功能
         function ToStrFun(fun) {
             return function (fullname) {
                 var args = [];
@@ -90,11 +97,11 @@ var System;
                 fun.apply(void 0, [arr].concat(args));
             };
         }
-        var SendMsg = ToStrFun(SendMessage);
-        var HasMsgType = ToStrFun(HasMessageType);
-        var GetListenerArray = ToStrFun(GetMessageListenObject);
-        var Regist = ToStrFun(RegistMessageType);
-        var ListenRegist = ToStrFun(RegistEventListener);
+        MessageCore.SendMsg = ToStrFun(SendMessage);
+        MessageCore.HasMsgType = ToStrFun(HasMessageType);
+        MessageCore.GetListenerArray = ToStrFun(GetMessageListenObject);
+        MessageCore.Regist = ToStrFun(RegistMessageType);
+        MessageCore.ListenRegist = ToStrFun(RegistEventListener);
     })(MessageCore = System.MessageCore || (System.MessageCore = {}));
 })(System || (System = {}));
 //# sourceMappingURL=MessageCore.js.map
