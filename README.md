@@ -1,16 +1,20 @@
  # PlOS
 基于Web前端技术的可扩展WebOS系统
-## 协议
-废除IPOP协议，直接全局使用JSON进行通信，对于系统调用有专门的RemoteProcess模块处理
-而对于普通对等通信则直接互发消息即可
-## 总体架构
-外围模块: System.Tools 命名空间用于提供基本工具函数支持 例如GUID生成器
-核心模块:
-1.  System.RemoteProcess 命名空间用于提供“远程过程调用”支持 提供受限容器功能
-2.  System.MessageCore 命名空间用于提供消息广播功能支持
-3.  System.ProcessManager 命名空间用于提供进程的创建销毁和进程间通信支持
-4.  System.Store 命名空间用于提供统一的“文件系统API”
-5.  System.ApplicationManager 命名空间用于提供应用级别的管理功能 包括权限记录 应用安装记录等
-6.  System.UIManager 命名空间用于提供UI绘图支持 目前此模块的实现有很大问题 考虑改为“拟自绘”方式
-7.  System.ModuleManager 命名空间提供系统模块加载功能
-8.  System.Service 命名空间提供服务管理（主要是SharedWebWorker的管理）
+## 总体规划
+为了简化设计和开发，目前第三次重新设计了整体架构，目测具有可行性
+模块：
+1.  System.Tools 提供基础工具函数的支持，主要给系统和系统模块用
+2.  System.ProcessCore 负责为进程的创建销毁和服务(sharedWorker)的创建销毁和其他操作提供基本支持
+3.  System.MessageCore 负责分拣消息，消息可以是从Process中传出的，也可以是系统传入Process的 其直接与ProcessCore连接
+4.  System.
+5.  System.UI 提供UI支持 包括窗口创建销毁 绘图等
+6.  System.Data 命名空间提供对公用类和接口定义的包装
+System.ProcessCore 中有Process类封装了Worker，其提供一个传入消息的消息队列功能，只有当Worker内的程序主动发送get消息时其才会将队列顶部的消息返回，没有消息则根据get消息中的信息选择等待有后返回，或直接返回无消息
+
+由Worker传出的基本消息为System.Data.IMessage对象 其中有Type成员表示Get或Post
+Data成员表示具体信息 Get时 Data为一个bool值true表示需要等待，false表示无需等待
+Post时 Data表示要发送出去的数据对象
+Process内部直接将Post消息中的Data发送出去，而不管其中的内容
+Data在Process内部被包装到一个IProcessMessage接口对象里，此对象中PID为发送者进程的GUID，Data就为Data对象本身
+这个IProcessMessage被发送到MessageCore中对应的接收函数中，剩下的就是MessageCore的事情了
+关于MessageCore的工作日后再补
