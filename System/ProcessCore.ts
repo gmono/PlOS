@@ -35,7 +35,8 @@ namespace System
             public constructor(public Sign:string,codeurl:string)
             {
                 this.pwork=new Worker(codeurl);
-                this.pwork.onmessage=this.OnWorkerMessage;
+                //这里为了保证this指针的正常..
+                this.pwork.onmessage=(...args)=>{this.OnWorkerMessage.apply(this,args);};
             }
             //杀死进程
             public Kill()
@@ -108,6 +109,14 @@ namespace System
                     this.MsgQueue.push(msg);
                 }
             }
+            /**
+             * 发送一个消息而不经过队列
+             * @param msg 消息
+             */
+            public ReceiveNow(msg:IMessage)
+            {
+                this.pwork.postMessage(msg);
+            }
             //SendMessage事件回调函数
             public OnSendMessage:(sign:string,data:IPostMessage)=>void=null;
         }
@@ -131,25 +140,35 @@ namespace System
             };
         }
         //进程表
-        let ProcessMap:Map<string,Process>=null;
+        let ProcessMap=new Map<string,Process>();
         /**
          * 创建进程的基础函数
          * @param sign 进程的标记号
          * @param codeurl 进程脚本文件的url 
+         * @return 提供的sign或生成的sign
          */
         export function CreateProcess(codeurl:string,sign:string=null)
         {
             if(sign==null) sign=Tools.Guid();
             //下面这行检测自定义sign的重复性
-            if(ProcessMap.has(sign)) return false;
+            if(ProcessMap.has(sign)) return null;
             let proc=new Process(sign,codeurl);
             ProcessMap.set(sign,proc);
+            //将process的发送消息事件绑定到消息集线器
+            proc.OnSendMessage=MessageHub;
+            //一切就绪 发送启动信号
+            let msg=MakeMsg("Start",null);
+            msg.Receiver=sign;
+            proc.ReceiveNow(msg);
+            return sign;
         }
         //消息集合
         export let OnSendMessage=new EventHub<(msg:IMessage)=>void>();
         /**
          * 消息集线器 所有进程的消息都发送到这个函数由这个函数包装为一个
          * 标准信息对象后发出
+         * 此模块的消息集线器只负责包装消息后发出
+         * 不负责解析消息 消息内容与集线器无关
          * @param sign 进程sign 由Process类报告
          * @param data 发送的消息
          */
@@ -175,7 +194,7 @@ namespace System
         {
             let blob=new Blob([code]);
             let url=window.URL.createObjectURL(blob);
-            CreateProcess(url,sign);
+            return CreateProcess(url,sign);
         }
         /**
          * 获取一个进程结构体
@@ -206,7 +225,7 @@ namespace System
             //这里先发送Kill消息
             let msg=MakeMsg("Kill",null);
             msg.Receiver=sign;
-            proc.ReceiveMessage(msg);
+            proc.ReceiveNow(msg);
             //设置超时检查
             setTimeout(checkfun, timeout);
             //如果没有超时则进程应该发送了kill消息 此时下面的Kill接收者应该响应从而结束发送者进程
