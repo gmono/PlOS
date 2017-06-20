@@ -18,3 +18,7 @@ Process内部直接将Post消息中的Data发送出去，而不管其中的内�
 Data在Process内部被包装到一个IProcessMessage接口对象里，此对象中PID为发送者进程的GUID，Data就为Data对象本身
 这个IProcessMessage被发送到MessageCore中对应的接收函数中，剩下的就是MessageCore的事情了
 关于MessageCore的工作日后再补
+## 系统支持库
+在系统核心完成后，系统支持库就要开始编写，系统支持库是给Worker中的脚本使用的库，通过importScript函数加载，此部分可能是本项目具有一定意义的关键所在
+## 进展
+目前进行了第三次设计 目测有较强的可实现性，目前已经完成了ProcessCore部分，核心部分还剩MessageCore未完成

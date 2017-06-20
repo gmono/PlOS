@@ -84,5 +84,28 @@ namespace System
                 }
             }
         }
+        //以下为工具类区域
+
+        /**
+         * 此类为事件集线器
+         * 通过此类的成员ListenerList添加监听器
+         */
+        export class EventHub<T extends Function>
+        {
+            public ListenerList:Array<T>=[];
+            public Call(...args):void
+            {
+                this.ListenerList.forEach((item)=>{
+                    try
+                    {
+                        item.apply(null,args);
+                    }
+                    catch(e)
+                    {
+                        console.log("eventfunc error!",e);
+                    }
+                });
+            }
+        }
     }
 }

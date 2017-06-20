@@ -85,6 +85,32 @@ var System;
             }
         }
         Tools.AdaptMore = AdaptMore;
+        //以下为工具类区域
+        /**
+         * 此类为事件集线器
+         * 通过此类的成员ListenerList添加监听器
+         */
+        var EventHub = (function () {
+            function EventHub() {
+                this.ListenerList = [];
+            }
+            EventHub.prototype.Call = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                this.ListenerList.forEach(function (item) {
+                    try {
+                        item.apply(null, args);
+                    }
+                    catch (e) {
+                        console.log("eventfunc error!", e);
+                    }
+                });
+            };
+            return EventHub;
+        }());
+        Tools.EventHub = EventHub;
     })(Tools = System.Tools || (System.Tools = {}));
 })(System || (System = {}));
 //# sourceMappingURL=Tools.js.map
