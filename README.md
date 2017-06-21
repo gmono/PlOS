@@ -6,9 +6,9 @@
 1.  System.Tools 提供基础工具函数的支持，主要给系统和系统模块用
 2.  System.ProcessCore 负责为进程的创建销毁和服务(sharedWorker)的创建销毁和其他操作提供基本支持
 3.  System.MessageCore 负责分拣消息，消息可以是从Process中传出的，也可以是系统传入Process的 其直接与ProcessCore连接
-4.  System.
+4.  System.BroadCastCore 提供广播消息监听和注册功能，其与一般系统消息不同，首先必须是注册了的广播消息才能进行广播，其次一个应用可以注册广播监听器，即使这个应用没有启动，监听器会在广播消息发生时启动监听器
 5.  System.UI 提供UI支持 包括窗口创建销毁 绘图等
-6.  System.Data 命名空间提供对公用类和接口定义的包装
+6.  System.DataType 命名空间提供对公用类和接口定义的包装
 System.ProcessCore 中有Process类封装了Worker，其提供一个传入消息的消息队列功能，只有当Worker内的程序主动发送get消息时其才会将队列顶部的消息返回，没有消息则根据get消息中的信息选择等待有后返回，或直接返回无消息
 
 由Worker传出的基本消息为System.Data.IMessage对象 其中有Type成员表示Get或Post
