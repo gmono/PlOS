@@ -10,18 +10,13 @@
 5.  System.UI 提供UI支持 包括窗口创建销毁 绘图等
 6.  System.DataType 命名空间提供对公用类和接口定义的包装
 System.ProcessCore 中有Process类封装了Worker，其提供一个传入消息的消息队列功能，只有当Worker内的程序主动发送get消息时其才会将队列顶部的消息返回，没有消息则根据get消息中的信息选择等待有后返回，或直接返回无消息
-
-由Worker传出的基本消息为System.Data.IMessage对象 其中有Type成员表示Get或Post
-Data成员表示具体信息 Get时 Data为一个bool值true表示需要等待，false表示无需等待
-Post时 Data表示要发送出去的数据对象
-Process内部直接将Post消息中的Data发送出去，而不管其中的内容
-Data在Process内部被包装到一个IProcessMessage接口对象里，此对象中PID为发送者进程的GUID，Data就为Data对象本身
-这个IProcessMessage被发送到MessageCore中对应的接收函数中，剩下的就是MessageCore的事情了
-关于MessageCore的工作日后再补
+核心框架中IMessage对象为在各模块之间传递消息的唯一标准对象
 ## 系统库
 在系统核心完成后，系统库就要开始编写，系统库是给Worker中的脚本使用的库，通过importScript函数加载，此部分可能是本项目具有一定意义的关键所在
 系统库包括最主要的一个部分就是对接收消息的初级解析，和对发送消息的初步封装，解析包括对ProcessCore发送的Start和Kill消息提供回调接口等
 ## 进展
 目前进行了第三次设计 目测有较强的可实现性，目前已经完成了ProcessCore部分，核心部分还剩MessageCore未完成
+Test为测试文件 目前已经将最关键的支撑技术之一 SharedArrayBuffer测试成功
+它将用来进行高效“进程”间通信，特别是程序和UI模块之间的通信
 ## 附加说明
 为了避免因为依赖关系复杂顺序不好控制，所有的模块都只能对Tools和DataType形成直接依赖，对其他模块的依赖应提供依赖注入接口，在Init函数中会进行各模块的拼接
