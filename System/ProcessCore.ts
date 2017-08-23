@@ -5,6 +5,7 @@ namespace System
         import IMessage=DataType.IMessage;
         import EventHub=Tools.EventHub;
         import MessageType=DataType.MessageType;
+        export type MessageReceiver=(msg:IMessage)=>void;
         interface IPostMessage
         {
             DestType:MessageType;
@@ -126,6 +127,11 @@ namespace System
         //此为本模块的消息构造函数 
         //构造一个本模块发送给进程的消息
         //Receiver不设置
+        /**
+         * 
+         * @param type 内部消息的类型 目前定了有Start和Kill 用于通知应用启动和结束
+         * @param data 
+         */
         function MakeMsg(type:string,data:any)
         {
             return <IMessage>{
@@ -163,7 +169,7 @@ namespace System
             return sign;
         }
         //消息集合
-        export let OnSendMessage=new EventHub<(msg:IMessage)=>void>();
+        export let OnSendMessage=new EventHub<MessageReceiver>();
         /**
          * 消息集线器 所有进程的消息都发送到这个函数由这个函数包装为一个
          * 标准信息对象后发出

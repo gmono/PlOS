@@ -18,7 +18,7 @@ namespace System
             Owner:string;
             //目的
             DestType:MessageType;
-            Receiver:string;
+            Receiver:string; //如果是Process则为进程sign 如果是System则是系统组件注册的名字
             Data:any;
         }
     }
