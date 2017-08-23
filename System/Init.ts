@@ -9,13 +9,12 @@ namespace System
         let sign=CreateProcess(`
         onmessage=function(){
             for(let i=0;i<100;++i){console.log(i);}
-        postMessage({operation:"Post",data:{DestType:"Process",Dest:"hello",Data:"hello world"}});
+        postMessage({operation:"Post",data:{DestType:"System",Dest:"test",Data:"hello world"}});
         }
         
         `);
-        
-        ProcessCore.OnSendMessage.ListenerList.push((msg:DataType.IMessage)=>{
+        MessageCore.SystemDestRegist("test",(msg:DataType.IMessage)=>{
             alert(JSON.stringify(msg));
-        })
+        });
     }
 }

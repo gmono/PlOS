@@ -211,6 +211,11 @@ var System;
         //此为本模块的消息构造函数 
         //构造一个本模块发送给进程的消息
         //Receiver不设置
+        /**
+         *
+         * @param type 内部消息的类型 目前定了有Start和Kill 用于通知应用启动和结束
+         * @param data
+         */
         function MakeMsg(type, data) {
             return {
                 Type: "System",
@@ -328,12 +333,67 @@ var System;
 var System;
 (function (System) {
     /**
+     * 此为消息核心
+     * 从系统各处收集各种消息分拣后进行重定向
+     * 消息核心在ProcessCore之后初始化所以此处已经可以引用ProcessCore中的内容
+     */
+    var MessageCore;
+    (function (MessageCore) {
+        var MessageHub = System.ProcessCore.OnSendMessage;
+        function MessageHandle(msg) {
+            //这里接收所有消息并进行分拣
+            if (msg.DestType == "System") {
+                SystemMSGHub(msg);
+                return;
+            }
+            //如果是到进程的消息 回发给ProcessCore
+            var proc = System.ProcessCore.GetProcessBySign(msg.Receiver);
+            if (proc != null) {
+                //此为有效sign
+                proc.ReceiveMessage(msg);
+            }
+        }
+        //下面为系统消息分发部分
+        //此为从dest名到接收器的映射
+        var SystemReceivers = new Map();
+        //对于系统消息 会根据注册的情况进行分发
+        /**
+         *
+         * @param destname 注册目的名
+         * @param receive 注册接收器
+         * @return 是否注册成功 如果没有说明有冲突
+         */
+        function SystemDestRegist(destname, receiver) {
+            if (SystemReceivers.has(destname))
+                return false;
+            if (receiver == null)
+                throw new Error("错误 ，Receiver不能为null");
+            SystemReceivers.set(destname, receiver);
+        }
+        MessageCore.SystemDestRegist = SystemDestRegist;
+        /**
+         * 系统消息集线器
+         * @param msg 消息
+         */
+        function SystemMSGHub(msg) {
+            if (SystemReceivers.has(msg.Receiver)) {
+                var receiver = SystemReceivers.get(msg.Receiver);
+                receiver(msg);
+            }
+            //否则什么也不做
+        }
+        MessageHub.ListenerList.push(MessageHandle);
+    })(MessageCore = System.MessageCore || (System.MessageCore = {}));
+})(System || (System = {}));
+var System;
+(function (System) {
+    /**
      * 系统总初始化函数
      */
     function Init() {
         var CreateProcess = System.ProcessCore.CreateProcessByCode;
-        var sign = CreateProcess("\n        onmessage=function(){\n            for(let i=0;i<100;++i){console.log(i);}\n        postMessage({operation:\"Post\",data:{DestType:\"Process\",Dest:\"hello\",Data:\"hello world\"}});\n        }\n        \n        ");
-        System.ProcessCore.OnSendMessage.ListenerList.push(function (msg) {
+        var sign = CreateProcess("\n        onmessage=function(){\n            for(let i=0;i<100;++i){console.log(i);}\n        postMessage({operation:\"Post\",data:{DestType:\"System\",Dest:\"test\",Data:\"hello world\"}});\n        }\n        \n        ");
+        System.MessageCore.SystemDestRegist("test", function (msg) {
             alert(JSON.stringify(msg));
         });
     }

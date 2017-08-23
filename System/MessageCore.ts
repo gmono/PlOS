@@ -46,7 +46,7 @@ namespace System
          * 系统消息集线器
          * @param msg 消息
          */
-        export function SystemMSGHub(msg:IMessage)
+         function SystemMSGHub(msg:IMessage)
         {
             if(SystemReceivers.has(msg.Receiver)){
                 let receiver=SystemReceivers.get(msg.Receiver);

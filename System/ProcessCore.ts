@@ -10,6 +10,7 @@ namespace System
         {
             DestType:MessageType;
             Dest:string;
+            //最终进程发出的数据为此处的Data对象
             Data:any;
         }
         interface IGetMessage
